@@ -1,0 +1,288 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --marker-color: #22c55e;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    padding: 20px 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+}
+
+h1 {
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-main);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.section {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.flex-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.val {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: monospace;
+}
+
+.slider-wrapper {
+    position: relative;
+    width: 100%;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+input[type="range"] {
+    width: 100%;
+    background: transparent;
+    accent-color: var(--accent);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.maridaje-zone-marker {
+    position: absolute;
+    width: 3px;
+    height: 14px;
+    background-color: var(--marker-color);
+    border-radius: 2px;
+    z-index: 1;
+    transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px;
+    margin-top: 2px;
+}
+
+.slider-labels span {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+select {
+    width: 100%;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Grilla de Control de Tiempos */
+.timer-cluster {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    text-align: center;
+    margin-top: 5px;
+    width: 100%;
+}
+
+.timer-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    padding: 10px 4px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.lbl-rec::after { content: "Recomendado"; }
+.lbl-rep::after { content: "Reproducción"; }
+.lbl-rem::after { content: "Remanente"; }
+
+.timer-card span {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timer-card strong {
+    font-size: 1.1rem;
+    color: var(--text-main);
+    font-family: monospace;
+}
+
+.timer-card.highlight {
+    border-color: rgba(56, 189, 248, 0.4);
+    background: rgba(56, 189, 248, 0.03);
+}
+.timer-card.highlight strong {
+    color: var(--accent);
+}
+
+.freq-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(51, 65, 85, 0.5);
+    padding-top: 10px;
+}
+
+.freq-footer strong {
+    color: var(--text-main);
+    font-family: monospace;
+}
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-start {
+    background: var(--accent);
+    color: #000;
+}
+.btn-start:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-start:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+.btn-stop {
+    background: #ef4444;
+    color: #fff;
+}
+.btn-stop:hover:not(:disabled) { background: #f87171; }
+.btn-stop:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+/* Tabla Científica de Ondas y Bloqueo */
+.wave-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.82rem;
+}
+
+.wave-table th, .wave-table td {
+    padding: 10px 6px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.wave-table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.wave-table tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.wave-table tr:hover {
+    background: rgba(56, 189, 248, 0.08);
+}
+
+.active-row {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+/* BLOQUEO TOTAL NATIVO POR CSS MIENTRAS ESTÁ ENCENDIDO */
+.table-blocked {
+    pointer-events: none !important; /* El navegador destruye cualquier evento click/touch */
+    opacity: 0.4;                    /* Feedback visual claro de desactivado */
+    transition: opacity 0.25s ease;
+}
+
+/* --- OPTIMIZACIÓN MÓVIL --- */
+@media (max-width: 480px) {
+    .timer-cluster {
+        gap: 6px;
+    }
+    .lbl-rec::after { content: "Rec."; }
+    .lbl-rep::after { content: "Rep."; }
+    .lbl-rem::after { content: "Rem."; }
+
+    .timer-card {
+        padding: 8px 2px;
+    }
+    .timer-card strong {
+        font-size: 1rem;
+    }
+    .freq-footer {
+        font-size: 0.68rem;
+        gap: 6px;
+    }
+}

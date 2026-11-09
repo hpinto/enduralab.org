@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/2282/2282210.png">	
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EnduraLAB Calibrador de Volumen(dB)">
+    <link rel="apple-touch-icon" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/2282/2282210.png">	
+    <title>EnduraLAB Calibrador de Volumen(dB)</title>
+	<link rel="stylesheet" href="style.css?v=1.0">
+    <!-- Incluir Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="app.js?v=1.0" defer></script>	  
+</head>
+<body>
+
+    <h2><img src="https://cdn-icons-png.flaticon.com/512/2282/2282210.png" alt="VU Logo" style="width: 32px; height: 32px;">EnduraLAB Calibrador de Volumen(dB)</h2>
+    <p>Objetivo: Unificar Volumen en distintos espacios</p>
+    
+    <button id="toggleBtn" onclick="toggleMonitoring()">Iniciar Monitoreo</button>
+    
+    <div id="stats">
+        Promedio Final: <span id="avgDb">--</span> dB
+    </div>
+
+    <div class="chart-container">
+        <canvas id="audioChart"></canvas>
+    </div>
+</body>
+</html>

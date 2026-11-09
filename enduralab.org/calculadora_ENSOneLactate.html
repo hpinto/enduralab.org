@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora Sistema ENS One Lactate | EnduraLab</title>
+    <link rel="stylesheet" href="styles.css?v1.0" />
+    <link rel="icon" type="image/jpeg" href="Logo1_Dark_Icono.jpg">
+    <link rel="apple-touch-icon" href="Logo1_Dark_Icono.jpg"> 
+    <meta property="og:title" content="EnduraLAB - ENS One Lactate">
+    <meta property="og:description" content="Sistema de nutrición unificado con Lactato para deportes de resistencia.">
+    <meta property="og:image" content="Compartir.jpg"> 
+    <meta name="theme-color" content="#0b0c10">
+</head>
+<body>
+    <header class="hero product-hero">
+        <div class="container">
+            <a href="index.html" class="back-link" style="display: inline-flex; align-items: center; gap: 8px;">
+                <span>← Volver a</span>
+                <img src="Logo1_Dark.png" alt="EnduraLab" style="height: 28px; width: auto; display: block;">
+            </a> 
+            <h1><span class="txt-calc">Calculadora </span><span class="txt-elg">ENS One </span><span class="txt-lac">Lactate</span></h1>
+            <p class="lead">Configura tu estrategia de nutrición e hidratación por hora utilizando la nueva fórmula unificada ENS One Lactate. Los resultados representan las dosis que necesitas preparar para toda tu sesión o carrera.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="calc-container">
+            
+            <div class="input-group">
+                <div class="input-item">
+                    <label>Carbohidratos Objetivo: <span id="targetChoVal">90</span> g/h</label>
+                    <input type="range" id="targetCho" min="30" max="120" step="5" value="90">
+                </div>
+                <div class="input-item">
+                    <label>Hidratación Objetivo: <span id="targetHydroVal">500</span> ml/h</label>
+                    <input type="range" id="targetHydro" min="200" max="1000" step="50" value="500">
+                </div>
+                
+                <div class="input-item">
+                    <label>Tiempo Total de Sesión: <span id="targetTimeVal">60</span> min</label>
+                    <input type="range" id="targetTime" min="30" max="900" step="15" value="60">
+                </div>
+
+                <div class="input-item">
+                    <label>Textura deseada para el Gel concentrado:</label>
+                    <input type="range" id="texturaGel" min="0.8" max="1.1" step="0.1" value="0.9" style="width: 100%; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-weight: bold;">
+                        <span style="cursor: pointer;" onclick="document.getElementById('texturaGel').value=0.8; calculate()">Denso</span>
+                        <span style="cursor: pointer;" onclick="document.getElementById('texturaGel').value=0.9; calculate()">Óptimo</span>
+                        <span style="cursor: pointer;" onclick="document.getElementById('texturaGel').value=1.0; calculate()">Fluido</span>
+                        <span style="cursor: pointer;" onclick="document.getElementById('texturaGel').value=1.1; calculate()">Muy Fluido</span>
+                    </div>
+                </div>
+
+                <div class="total-badge" style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Aporte Total de la Sesión (<span id="totalHoursVal">1h 0min</span>)</div>
+                    <div style="font-size: 1.15rem; margin-top: 5px;" id="sessionSummary">
+                        <!-- Se llena con JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-group">
+                <div class="result-card eld">
+                    <div class="card-label" style="color: var(--eld)">Mochila / Caramagiola</div>
+                    <h3><span class="txt-eld">Modo Hidratación</span></h3>
+                    <p>Disolver <span class="result-value" id="eldPowder">40</span> <span class="result-unit">g de ENS One Lactate</span></p>
+                    <p>en <span class="result-value" id="eldWater">500</span> <span class="result-unit">ml de agua</span></p>
+                    <small style="display:block; margin-top:10px; color:var(--text-muted); font-size:0.75rem;">* Aporta una textura sutilmente sedosa.</small>
+                </div>
+
+                <div class="result-card elg">
+                    <div class="card-label" style="color: var(--elg)">Soft-flask / Bidón Corto</div>
+                    <h3><span class="txt-elg">Modo Nutrición</span> (Gel)</h3>
+                    <p>Disolver <span class="result-value" id="elgPowder">56</span> <span class="result-unit">g de ENS One Lactate</span></p>
+                    <p>en <span class="result-value" id="elgWater">123</span> <span class="result-unit">ml de agua</span></p>
+                    <p style="margin: 15px 0 0 0; font-size: 0.9rem;">
+                        <span style="color: var(--text-muted);">Volumen total en el envase:</span> 
+                        <strong style="color: #fff; font-size: 1.1rem;"><span id="volumenTotalGel">0</span> ml</strong>
+                    </p> 
+                    <small style="display:block; margin-top:10px; color:var(--text-muted); font-size:0.75rem;">* Activa la consistencia del gel mediante la reticulación fría.</small>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const targetChoInput = document.getElementById('targetCho');
+        const targetHydroInput = document.getElementById('targetHydro');
+        const targetTimeInput = document.getElementById('targetTime');
+        const texturaGelInput = document.getElementById('texturaGel');
+
+        // CONSTANTES ACTUALIZADAS PARA ENS ONE Lactate
+        const CHO_PURITY = 0.9389; // 93.89% de carbohidratos puros en polvo
+        const SODIUM_PER_GRAM = 0.0124; // 12.4 mg de sodio elemental por gramo de polvo
+        const LACTATE_PER_GRAM = 0.03158; // 3.158% de masa corresponde a la matriz de Lactato
+        const HYDRO_POWDER_PER_ML = 0.08; // 40g de polvo por cada 500ml de agua (0.08 g/ml)
+
+        function calculate() {
+            const targetCho = parseFloat(targetChoInput.value);
+            const targetHydro = parseFloat(targetHydroInput.value);
+            const totalMinutes = parseFloat(targetTimeInput.value);
+            const ratioAgua = parseFloat(texturaGelInput.value);
+
+            // Conversión base a factor de horas
+            const hours = totalMinutes / 60;
+
+            // Actualizar valores de los labels
+            document.getElementById('targetChoVal').innerText = targetCho;
+            document.getElementById('targetHydroVal').innerText = targetHydro;
+            document.getElementById('targetTimeVal').innerText = totalMinutes;
+
+            // Formatear minutos "Xh Xmin"
+            const hrsPart = Math.floor(totalMinutes / 60);
+            const minsPart = totalMinutes % 60;
+            let timeString = "";
+            if (hrsPart > 0) {
+                timeString += hrsPart + "h";
+                if (minsPart > 0) {
+                    timeString += " " + minsPart + "min";
+                }
+            } else {
+                timeString += minsPart + "min";
+            }
+            document.getElementById('totalHoursVal').innerText = timeString;
+
+            // 1. MÓDULO HIDRATACIÓN
+            const eldPowderPerHour = targetHydro * HYDRO_POWDER_PER_ML;
+            const eldChoPerHour = eldPowderPerHour * CHO_PURITY;
+            
+            let eldPowderTotal = eldPowderPerHour * hours;
+            const eldWaterTotal = targetHydro * hours;
+
+            // 2. MÓDULO NUTRICIÓN
+            let remainingChoPerHour = targetCho - eldChoPerHour;
+            if (remainingChoPerHour < 0) remainingChoPerHour = 0;
+
+            let elgPowderTotal = (remainingChoPerHour / CHO_PURITY) * hours;
+
+            // Blindaje clásico
+            const totalChoTargetSession = targetCho * hours;
+            const maxTotalPowder = totalChoTargetSession / CHO_PURITY;
+            if ((eldPowderTotal + elgPowderTotal) > maxTotalPowder) {
+                if (eldPowderTotal > maxTotalPowder) {
+                    eldPowderTotal = maxTotalPowder;
+                    elgPowderTotal = 0;
+                } else {
+                    elgPowderTotal = maxTotalPowder - eldPowderTotal;
+                }
+            }
+
+            const elgWaterTotal = elgPowderTotal * ratioAgua;
+
+            // 3. TOTALES CONSOLIDADOS NETOS EN LA SESIÓN
+            const totalPowderReal = eldPowderTotal + elgPowderTotal;
+            const totalChoReal = totalPowderReal * CHO_PURITY;
+            const totalSodiumReal = totalPowderReal * SODIUM_PER_GRAM * 1000;
+            const totalLactateReal = totalPowderReal * LACTATE_PER_GRAM; // Gramos de Lactato
+            const totalWaterReal = eldWaterTotal + elgWaterTotal;
+
+            // 4. VOLUMEN TOTAL DEL ENVASE (Cálculo Físico por Densidad: Masa total / Densidad 1.35)
+            const volumenTotalFinal = elgPowderTotal > 0 ? Math.round((elgPowderTotal + elgWaterTotal) / 1.35) : 0;
+
+            // 5. RENDERIZADO EN INTERFAZ
+            document.getElementById('eldPowder').innerText = Math.round(eldPowderTotal);
+            document.getElementById('eldWater').innerText = Math.round(eldWaterTotal);
+            
+            document.getElementById('elgPowder').innerText = Math.round(elgPowderTotal);
+            document.getElementById('elgWater').innerText = Math.round(elgWaterTotal);
+            document.getElementById('volumenTotalGel').innerText = volumenTotalFinal;
+
+            // Actualización del Resumen con el Lactato destacado
+            document.getElementById("sessionSummary").innerHTML = 
+                `<strong>${Math.round(totalChoReal)}</strong> g CHO | ` + 
+                `<strong style="color: #ff5722;">${totalLactateReal.toFixed(1)}</strong> <span style="color: #ff5722;">g Lactato</span> | ` + 
+                `<strong>${Math.round(totalSodiumReal)}</strong> mg Sodio | ` + 
+                `<strong>${Math.round(totalWaterReal)}</strong> ml`;
+        }
+
+        // Escuchadores
+        targetChoInput.addEventListener('input', calculate);
+        targetHydroInput.addEventListener('input', calculate);
+        targetTimeInput.addEventListener('input', calculate);
+        texturaGelInput.addEventListener('input', calculate);
+
+        // Inicialización
+        calculate();
+    </script>
+</body>
+</html>

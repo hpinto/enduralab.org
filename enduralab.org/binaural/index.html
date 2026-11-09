@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/1166/1166925.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EnduraLAB Binaural">
+    <link rel="apple-touch-icon" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/1166/1166925.png">
+    <title>EnduraLAB Binaural</title>
+    <link rel="stylesheet" href="style.css?v=3.1">
+	<script src="app.js?v=3.1" defer></script>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="mainTitle" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+      <img src="https://cdn-icons-png.flaticon.com/512/1166/1166925.png" alt="QR Logo" style="width: 32px; height: 32px;">
+      EnduraLAB Binaural
+    </h1>
+    <div class="section">
+        <div class="flex-label">
+            <label for="baseHz">Frecuencia Base (Portadora)</label>
+            <span class="val" id="baseVal">150 Hz</span>
+        </div>
+        
+        <div class="slider-wrapper">
+            <div class="maridaje-zone-marker" id="markerMin"></div>
+            <div class="maridaje-zone-marker" id="markerMax"></div>
+            <input type="range" id="baseHz" min="60" max="350" step="1" value="150">
+        </div>
+        
+        <div class="slider-labels">
+            <span>Grave (Delta/Theta)</span>
+            <span>Medio (Alpha/Beta)</span>
+            <span>Alto (Gamma)</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="flex-label" style="margin-bottom: 6px;">
+            <label>Onda Binaural Objetivo</label>
+            <span class="val" id="diffVal">2.0 Hz</span>
+        </div>
+
+        <table class="wave-table">
+            <thead>
+                <tr>
+                    <th>Frecuencia</th>
+                    <th>Banda / Estado Neuroacústico</th>
+                </tr>
+            </thead>
+            <tbody id="waveLattice">
+                <tr data-hz="2.0" class="active-row"><td>2.0 Hz</td><td>Delta (Sueño, Reparación Física masiva)</td></tr>
+                <tr data-hz="6.0"><td>6.0 Hz</td><td>Theta (Meditación, Creatividad profunda)</td></tr>
+                <tr data-hz="10.0"><td>10.0 Hz</td><td>Alpha (Foco Ligero, Aprendizaje, Anti-ansiedad)</td></tr>
+                <tr data-hz="15.0"><td>15.0 Hz</td><td>Beta (Concentración Alta, Programación, Trabajo)</td></tr>
+                <tr data-hz="40.0"><td>40.0 Hz</td><td>Gamma (Procesamiento Cognitivo Máximo)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <label for="ambientSound">Fondo Texturizado / Ruido de Color</label>
+        <select id="ambientSound">
+            <option value="white">Blanco (Aislamiento Extremo)</option>
+            <option value="grey" selected>Gris (Equilibrio Biológico)</option>			
+            <option value="brown">Marrón (Calma y Reducción de Ansiedad)</option>
+            <option value="pink">Rosa (Foco)</option>			
+            <option value="none">Ninguno</option>
+        </select>
+
+        <div class="flex-label" style="margin-top: 12px;">
+            <label for="volAmbient">Volumen de Fondo</label>
+            <span class="val" id="volAmbVal">100%</span>
+        </div>
+        <input type="range" id="volAmbient" min="0" max="100" step="1" value="100">
+    </div>
+
+    <div class="section">
+        <label>Métricas y Protocolo de Tiempo</label>
+        <div class="timer-cluster">
+            <div class="timer-card">
+                <span class="lbl-rec"></span>
+                <strong id="timeRecommended">90:00</strong>
+            </div>
+            <div class="timer-card">
+                <span class="lbl-rep"></span>
+                <strong id="timeElapsed">00:00</strong>
+            </div>
+            <div class="timer-card highlight">
+                <span class="lbl-rem"></span>
+                <strong id="timeRemaining">90:00</strong>
+            </div>
+        </div>
+        
+        <div class="freq-footer">
+            <span>Monitoreo L: <strong id="freqLDisplay">89.0 Hz</strong></span>
+            <span>|</span>
+            <span>Monitoreo R: <strong id="freqRDisplay">91.0 Hz</strong></span>
+        </div>
+    </div>
+
+    <div class="btn-grid">
+        <button class="btn-start" id="btnStart">Encender</button>
+        <button class="btn-stop" id="btnStop" disabled>Detener</button>
+    </div>
+</div>
+</body>
+</html>

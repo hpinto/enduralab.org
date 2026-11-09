@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnduraLab AI Trainer</title>
+    <!-- Librería de parseo Markdown a HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary: #0000FF; 
+            --secondary: #008000;
+            --bg: #f4f4f9;
+            --chat-bg: #ffffff;
+            --text: #333333;
+        }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; }
+        .chat-container { width: 100%; max-width: 700px; background: var(--chat-bg); display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .chat-header { background: #0000FF; color: white; padding: 1rem; text-align: center; font-weight: bold; border-bottom: 4px solid #008000; letter-spacing: 1px; }
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .message { padding: 12px 16px; border-radius: 8px; max-width: 90%; line-height: 1.5; font-size: 0.95rem; }
+        
+        /* Ajustes específicos para el renderizado del Markdown */
+        .message p:first-child { margin-top: 0; }
+        .message p:last-child { margin-bottom: 0; }
+        .message h3 { margin-top: 0.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .message ul { margin-top: 0.5rem; margin-bottom: 0.5rem; padding-left: 1.5rem; }
+        .message li { margin-bottom: 0.25rem; }
+        .message img { max-width: 100%; border-radius: 6px; margin-top: 8px; }
+
+        .user-msg { background: #008000; color: white; align-self: flex-end; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: pre-wrap; }
+        .ai-msg { background: #e9ecef; color: var(--text); align-self: flex-start; }
+        
+        .preview-container { padding: 0 1rem; display: none; align-items: center; gap: 10px; background: #fafafa; border-top: 1px solid #ddd; }
+        .preview-container img { height: 50px; border-radius: 4px; border: 1px solid #ccc; }
+        
+        .input-area { display: flex; padding: 1rem; border-top: 1px solid #ddd; background: #fafafa; align-items: center; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; outline: none; }
+        input[type="text"]:focus { border-color: #0000FF; }
+        
+        .file-upload-btn { background: #e9ecef; border: 1px solid #ccc; padding: 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .file-upload-btn:hover { background: #dde2e6; }
+        
+        button#sendBtn { background: #0000FF; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button#sendBtn:disabled { background: #aaa; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">ENDURALAB AI TRAINER</div>
+        <div class="chat-messages" id="messages"></div>
+        
+        <!-- Contenedor de vista previa para la imagen adjunta -->
+        <div class="preview-container" id="previewContainer">
+            <img id="imagePreview" src="" alt="Vista previa">
+            <span id="removeImage" style="cursor:pointer; color:red; font-weight:bold;" onclick="clearImage()">✕ Quitar</span>
+        </div>
+
+        <div class="input-area">
+            <label class="file-upload-btn" title="Adjuntar imagen">
+                📷 <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+            </label>
+            <input type="text" id="userInput" placeholder="Ingresa tu consulta biométrica o de carga (o pega una imagen)..." onkeypress="handleEnter(event)" onpaste="handlePaste(event)">
+            <button id="sendBtn" onclick="sendMessage()">Analizar</button>
+        </div>
+    </div>
+    <script>
+        const API_URL = "https://www.enduralab.org/api/chat";
+        const messagesDiv = document.getElementById('messages');
+        const inputField = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+
+        let currentImageBase64 = null;
+        let currentMimeType = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) processFile(file);
+        }
+
+        function handlePaste(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.type.indexOf("image") === 0) {
+                    const file = item.getAsFile();
+                    processFile(file);
+                    event.preventDefault();
+                }
+            }
+        }
+
+        function processFile(file) {
+            currentMimeType = file.type;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageBase64 = e.target.result.split(',')[1];
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImage() {
+            currentImageBase64 = null;
+            currentMimeType = null;
+            imagePreview.src = '';
+            previewContainer.style.display = 'none';
+            document.getElementById('imageInput').value = '';
+        }
+
+        function addMessage(text, isUser, imgSrc = null) {
+            const div = document.createElement('div');
+            div.className = 'message ' + (isUser ? 'user-msg' : 'ai-msg');
+            
+            if (isUser) {
+                let content = text;
+                if (imgSrc) {
+                    content += `<br><img src="${imgSrc}" style="max-width:200px; border-radius:4px; margin-top:5px;">`;
+                }
+                div.innerHTML = content;
+            } else if (text === "Calculando inferencias...") {
+                div.textContent = text;
+            } else {
+                div.innerHTML = marked.parse(text);
+            }
+            
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = inputField.value.trim();
+            if (!text && !currentImageBase64) return;
+
+            const cachedImage = currentImageBase64;
+            const cachedMime = currentMimeType;
+            const imgSrcForBubble = cachedImage ? `data:${cachedMime};base64,${cachedImage}` : null;
+
+            addMessage(text || "[Imagen adjunta]", true, imgSrcForBubble);
+            
+            inputField.value = '';
+            clearImage();
+            inputField.disabled = true;
+            sendBtn.disabled = true;
+            addMessage("Calculando inferencias...", false);
+            
+            const loadingDiv = messagesDiv.lastChild;
+
+            try {
+                const payload = {
+                    message: text,
+                    image_base64: cachedImage,
+                    mime_type: cachedMime
+                };
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error("Fallo de red");
+                const data = await response.json();
+                
+                loadingDiv.innerHTML = marked.parse(data.response);
+            } catch (error) {
+                loadingDiv.textContent = "[Error Crítico] El orquestador no responde o el enlace de red fue cortado.";
+            } finally {
+                inputField.disabled = false;
+                sendBtn.disabled = false;
+                inputField.focus();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+    </script>
+</body>
+</html>

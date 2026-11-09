@@ -1,0 +1,34 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+}
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    /*text-transform: capitalize;*/
+}
+.error { color: #e74c3c; text-align: center; font-weight: bold; background: #fadbd8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+.debug-log { background: #2c3e50; color: #2ecc71; padding: 10px; font-family: monospace; border-radius: 5px; margin-bottom: 20px; font-size: 0.85em; }
+
+.workout-card {
+    background: white;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 6px solid #ccc;
+}
+
+.workout-card.swim { border-left-color: #0076FF; }     /* Azul */
+.workout-card.bike { border-left-color: #2ECC71; }     /* Verde */
+.workout-card.run { border-left-color: #E67E22; }      /* Naranjo */
+.workout-card.strength { border-left-color: #9B59B6; } /* Morado */
+
+.workout-date { color: #7f8c8d; font-size: 0.9em; font-weight: bold; }
+.workout-title { color: #2c3e50; margin: 5px 0; font-size: 1.3em; }
+.workout-desc { color: #555; white-space: pre-line; font-size: 0.95em; line-height: 1.5; }

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnduraLab STS</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        body { background-color: #111; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #00ffcc; margin-bottom: 10px; }
+        .control-panel { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; background: #222; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+        input, button { padding: 10px; font-size: 14px; border-radius: 5px; border: 1px solid #444; background: #333; color: #fff; }
+        button { background-color: #00ffcc; color: #000; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+        button:hover:not(:disabled) { background-color: #00ccaa; }
+        button:disabled { background-color: #444 !important; color: #777 !important; cursor: not-allowed; border: 1px solid #555; }
+        
+        .btn-hr { background-color: #ff3366; color: white; }
+        .btn-hr:hover:not(:disabled) { background-color: #cc0033; }
+        
+        #btn-play { background-color: #43a047; color: white; font-size: 16px; padding: 10px 30px; }
+        #btn-play.active { background-color: #fb8c00; }
+        
+        #btn-stop { background-color: #e53935; color: white; font-size: 16px; padding: 10px 30px; }
+        #btn-stop:hover:not(:disabled) { background-color: #c62828; }
+
+        .btn-export { background-color: #8e24aa; color: white; }
+        .btn-export:hover:not(:disabled) { background-color: #6a1b9a; }
+        
+        .head-unit { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
+        .metric-box { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 15px; text-align: center; }
+        .metric-title { color: #888; font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
+        .metric-val { font-size: 32px; font-weight: bold; font-family: monospace; }
+        .val-power { color: #00ffcc; } .val-cadence { color: #ffeb3b; } .val-hr { color: #ff3366; } .val-speed { color: #fff; } .val-grade { color: #ff9900; } .val-dist { color: #00bfff; }
+        
+        .dashboard { display: flex; gap: 20px; height: 400px; }
+        #gauge-container, #chart-container { background: #222; border-radius: 8px; padding: 10px; border: 1px solid #333; }
+        #gauge-container { flex: 1; } #chart-container { flex: 2; }
+        .log-panel { margin-top: 20px; background: #000; padding: 15px; border-radius: 8px; height: 120px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #aaa; border: 1px solid #444; }
+    </style>
+</head>
+<body>
+
+    <h1>EnduraLab STS</h1>
+    
+    <div class="control-panel">
+        <div><label>Peso (kg):</label> <input type="number" id="weight-input" value="75" style="width: 60px;" title="Peso del ciclista (Se sumarán 9kg de bicicleta)"></div>
+        <div><label>FTP (W):</label> <input type="number" id="ftp-input" value="200" style="width: 60px;"></div>
+        <div><label>GPX:</label> <input type="file" id="gpx-input" accept=".gpx"></div>
+        <button id="btn-connect-hr" class="btn-hr">1. Conectar FC</button>
+        <button id="btn-connect">2. Conectar Rodillo</button>
+        <button id="btn-play" disabled>▶ Iniciar Ruta</button>
+        <button id="btn-stop" disabled>⏹ Finalizar</button>
+        <button id="btn-export" class="btn-export" disabled>💾 Descargar .TCX</button>
+    </div>
+
+    <div class="head-unit">
+        <div class="metric-box"><div class="metric-title">Potencia (3s)</div><div id="pwr-val" class="metric-val val-power">0</div></div>
+        <div class="metric-box"><div class="metric-title">Cadencia</div><div id="cad-val" class="metric-val val-cadence">0</div></div>
+        <div class="metric-box"><div class="metric-title">Frec. Cardíaca</div><div id="hr-val" class="metric-val val-hr">--</div></div>
+        <div class="metric-box"><div class="metric-title">Vel. Virtual (km/h)</div><div id="spd-val" class="metric-val val-speed">0.0</div></div>
+        <div class="metric-box"><div class="metric-title">Pendiente (%)</div><div id="grad-val" class="metric-val val-grade">0.0</div></div>
+        <div class="metric-box"><div class="metric-title">Distancia (km)</div><div id="dist-val" class="metric-val val-dist">0.00</div></div>
+    </div>
+
+    <div class="dashboard">
+        <div id="gauge-container"></div>
+        <div id="chart-container"></div>
+    </div>
+
+    <div class="log-panel" id="log-output">Sistema iniciado... Universal Edition (Soporte FTMS + FE-C)<br></div>
+
+    <script>
+        // ==========================================
+        // CONSTANTES Y VARIABLES GLOBALES
+        // ==========================================
+        // Telemetría Pública
+        const CYCLING_POWER_SERVICE = 0x1818;
+        const CYCLING_POWER_MEASUREMENT = 0x2A63;
+        
+        // Control Estándar FTMS
+        const FTMS_SERVICE = 0x1826;
+        const FTMS_CONTROL_POINT_CHAR = 0x2AD9;
+
+        // Control Propietario ThinkRider/Magene
+        const FEC_SERVICE = "6e40fec1-b5a3-f393-e0a9-e50e24dcca9e";
+        const FEC_TX_CHAR = "6e40fec2-b5a3-f393-e0a9-e50e24dcca9e";
+
+        // Banda Cardíaca
+        const HR_SERVICE = 0x180D;
+        const HR_MEASUREMENT_CHAR = 0x2A37;
+
+        let activeControlProtocol = null; // 'FTMS' | 'FEC' | null
+        let activeControlChar = null;
+
+        let wakeLock = null;
+        let ftp = 200;
+        let riderWeight = 75;
+        let routeData = []; 
+        let gpxFileName = "Ruta GPX"; 
+        
+        let isTrainerConnected = false;
+        let isGpxLoaded = false;
+        let isWorkoutActive = false;
+        let isWorkoutFinished = false;
+        
+        let currentVirtualDistance = 0; 
+        let currentElevation = 0;
+        let sessionRecords = []; 
+        let startTime = null;
+
+        let lastUpdateTime = Date.now();
+        let lastCrankRevs = 0, lastCrankTime = 0;
+        
+        let power3sBuffer = [0, 0, 0]; 
+        let currentHR = null;
+        let currentVirtualSpeed = 0, currentCadence = 0, currentGradient = 0;
+
+        const logPanel = document.getElementById('log-output');
+        function log(msg) { logPanel.innerHTML += `> ${msg}<br>`; logPanel.scrollTop = logPanel.scrollHeight; }
+
+        const btnPlay = document.getElementById('btn-play');
+        const btnStop = document.getElementById('btn-stop');
+        const btnExport = document.getElementById('btn-export');
+
+        // ==========================================
+        // GESTIÓN DE ENERGÍA (WAKE LOCK API)
+        // ==========================================
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    log("Bloqueo de pantalla activado (Wake Lock).");
+                }
+            } catch (err) {
+                log(`Advertencia de Energía: No se pudo bloquear la pantalla (${err.message})`);
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+
+        // ==========================================
+        // CARGA DE ESTADO (LOCALSTORAGE)
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedFTP = localStorage.getItem('enduralab_ftp');
+            const savedWeight = localStorage.getItem('enduralab_weight');
+            
+            if (savedFTP) {
+                ftp = parseInt(savedFTP);
+                document.getElementById('ftp-input').value = ftp;
+            }
+            if (savedWeight) {
+                riderWeight = parseFloat(savedWeight);
+                document.getElementById('weight-input').value = riderWeight;
+            }
+            initGauge();
+            renderElevationProfile([], [], gpxFileName);
+        });
+
+        document.getElementById('weight-input').addEventListener('change', (e) => { 
+            riderWeight = parseFloat(e.target.value) || 75; 
+            localStorage.setItem('enduralab_weight', riderWeight);
+        });
+        
+        document.getElementById('ftp-input').addEventListener('change', (e) => { 
+            ftp = parseInt(e.target.value) || 200; 
+            localStorage.setItem('enduralab_ftp', ftp);
+            initGauge(); 
+        });
+
+        function evaluateUIState() {
+            if (isWorkoutFinished) return;
+            if (isTrainerConnected && isGpxLoaded) btnPlay.disabled = false;
+        }
+
+        // ==========================================
+        // FÍSICA Y VELOCIDAD VIRTUAL
+        // ==========================================
+        function calculateVirtualSpeed(power, gradient, weightKg) {
+            if (power <= 0) return 0;
+            const totalMass = weightKg + 9.0; 
+            const g = 9.81;
+            const Crr = 0.004; 
+            const CdA = 0.32;  
+            const rho = 1.225; 
+            const slope = gradient / 100;
+            
+            let v = 8.0; 
+            for (let i = 0; i < 5; i++) {
+                let F_grav = totalMass * g * slope;
+                let F_roll = totalMass * g * Crr * Math.cos(Math.atan(slope));
+                let F_aero = 0.5 * rho * CdA * v * v;
+                
+                let P_calc = (F_grav + F_roll + F_aero) * v;
+                let P_deriv = (F_grav + F_roll) + 1.5 * rho * CdA * v * v; 
+                
+                v = v - (P_calc - power) / P_deriv;
+                if (v < 0) v = 0;
+            }
+            return v * 3.6; 
+        }
+
+        // ==========================================
+        // CONTROL DE SESIÓN Y GPX
+        // ==========================================
+        btnPlay.addEventListener('click', async () => {
+            if (isWorkoutFinished) return;
+            
+            await requestWakeLock(); 
+            
+            isWorkoutActive = !isWorkoutActive;
+            if (isWorkoutActive) {
+                btnPlay.innerText = "⏸ Pausar Ruta"; 
+                btnPlay.classList.add('active');
+                btnStop.disabled = false;
+                lastUpdateTime = Date.now();
+                if (!startTime) startTime = new Date();
+                log("Entrenamiento Iniciado. Grabando telemetría.");
+            } else {
+                btnPlay.innerText = "▶ Continuar Ruta"; 
+                btnPlay.classList.remove('active');
+                sendGradientToTrainer(0);
+                document.getElementById('grad-val').innerText = "0.0";
+                log("Entrenamiento Pausado. Rodillo liberado a 0%.");
+            }
+        });
+
+        btnStop.addEventListener('click', () => {
+            isWorkoutActive = false;
+            isWorkoutFinished = true;
+            
+            btnPlay.disabled = true;
+            btnPlay.innerText = "▶ Ruta Finalizada";
+            btnPlay.classList.remove('active');
+            btnStop.disabled = true;
+            
+            sendGradientToTrainer(0);
+            document.getElementById('grad-val').innerText = "0.0";
+            
+            log("Entrenamiento FINALIZADO. Grabación detenida.");
+            
+            if (currentVirtualDistance > 0) {
+                btnExport.disabled = false;
+                log("Archivo .TCX validado y listo para descarga.");
+            } else {
+                log("Distancia 0m. No se generará archivo .TCX.");
+            }
+            
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => wakeLock = null);
+            }
+        });
+
+        function getDistanceFromLatLon(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * (Math.PI/180), dLon = (lon2 - lon1) * (Math.PI/180); 
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+        }
+
+        document.getElementById('gpx-input').addEventListener('change', function(e) {
+            const file = e.target.files[0]; if (!file) return;
+            gpxFileName = file.name; 
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const trkpts = new DOMParser().parseFromString(e.target.result,"text/xml").getElementsByTagName("trkpt");
+                routeData = []; let routeX = []; let routeY = []; let totalDist = 0;
+                
+                for (let i = 0; i < trkpts.length; i++) {
+                    const lat = parseFloat(trkpts[i].getAttribute("lat"));
+                    const lon = parseFloat(trkpts[i].getAttribute("lon"));
+                    const ele = trkpts[i].getElementsByTagName("ele").length > 0 ? parseFloat(trkpts[i].getElementsByTagName("ele")[0].childNodes[0].nodeValue) : 0;
+                    
+                    if (i > 0) {
+                        const dist = getDistanceFromLatLon(parseFloat(trkpts[i-1].getAttribute("lat")), parseFloat(trkpts[i-1].getAttribute("lon")), lat, lon);
+                        totalDist += dist;
+                        let grad = dist > 0 ? ((ele - routeData[i-1].elevation) / (dist * 1000)) * 100 : 0;
+                        routeData.push({ lat: lat, lon: lon, distance: totalDist, elevation: ele, gradient: Math.max(-15, Math.min(15, grad)) });
+                    } else {
+                        routeData.push({ lat: lat, lon: lon, distance: 0, elevation: ele, gradient: 0 });
+                    }
+                    routeX.push(totalDist); routeY.push(ele);
+                }
+                
+                renderElevationProfile(routeX, routeY, gpxFileName);
+                isGpxLoaded = true;
+                log(`GPX Cargado: ${totalDist.toFixed(2)} km`);
+                evaluateUIState();
+            };
+            reader.readAsText(file);
+        });
+
+        // ==========================================
+        // CONEXIONES BLUETOOTH
+        // ==========================================
+        document.getElementById('btn-connect-hr').addEventListener('click', async () => {
+            try {
+                await requestWakeLock();
+                const hrBluetoothDevice = await navigator.bluetooth.requestDevice({ filters: [{ services: [HR_SERVICE] }] });
+                const char = await (await (await hrBluetoothDevice.gatt.connect()).getPrimaryService(HR_SERVICE)).getCharacteristic(HR_MEASUREMENT_CHAR);
+                await char.startNotifications();
+                char.addEventListener('characteristicvaluechanged', (e) => {
+                    const val = e.target.value;
+                    currentHR = (val.getUint8(0) & 0x01) === 1 ? val.getUint16(1, true) : val.getUint8(1);
+                    document.getElementById('hr-val').innerText = currentHR;
+                });
+                log(`Banda HR conectada: ${hrBluetoothDevice.name || 'Desconocida'}`);
+            } catch (err) { log(`Error HR: ${err}`); }
+        });
+
+        document.getElementById('btn-connect').addEventListener('click', async () => {
+            try {
+                await requestWakeLock();
+                log("Solicitando Rodillo...");
+                
+                // Pedimos el de potencia (Universal) y dejamos ambos controles como opcionales
+                const trainerBluetoothDevice = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [CYCLING_POWER_SERVICE] }],
+                    optionalServices: [FTMS_SERVICE, FEC_SERVICE] 
+                });
+                
+                trainerBluetoothDevice.addEventListener('gattserverdisconnected', () => { 
+                    log("Rodillo Desconectado."); 
+                    activeControlProtocol = null;
+                    activeControlChar = null; 
+                    isTrainerConnected = false;
+                });
+                
+                const server = await trainerBluetoothDevice.gatt.connect();
+                log(`Rodillo conectado: ${trainerBluetoothDevice.name || 'Dispositivo Genérico'}. Configurando telemetría...`);
+                
+                const pwrService = await server.getPrimaryService(CYCLING_POWER_SERVICE);
+                const pwrChar = await pwrService.getCharacteristic(CYCLING_POWER_MEASUREMENT);
+                await pwrChar.startNotifications();
+                pwrChar.addEventListener('characteristicvaluechanged', handlePowerData);
+
+                // Enrutador Dinámico de Control de Resistencia
+                try {
+                    log("Buscando servicio FTMS universal...");
+                    const ftmsService = await server.getPrimaryService(FTMS_SERVICE);
+                    activeControlChar = await ftmsService.getCharacteristic(FTMS_CONTROL_POINT_CHAR);
+                    await activeControlChar.writeValue(new Uint8Array([0x00])); // Solicitar Control
+                    activeControlProtocol = 'FTMS';
+                    log("Protocolo FTMS inicializado con éxito. Control total activo.");
+                } catch (e1) {
+                    try {
+                        log("FTMS no detectado. Buscando servicio propietario FE-C...");
+                        const fecService = await server.getPrimaryService(FEC_SERVICE);
+                        activeControlChar = await fecService.getCharacteristic(FEC_TX_CHAR);
+                        activeControlProtocol = 'FEC';
+                        log("Protocolo ThinkRider/Magene FE-C inicializado con éxito. Control total activo.");
+                    } catch (e2) {
+                        log("Ningún servicio de control compatible hallado. El rodillo funcionará como potenciómetro pasivo.");
+                    }
+                }
+
+                isTrainerConnected = true;
+                lastUpdateTime = Date.now();
+                evaluateUIState();
+            } catch (err) { log(`Error BT: ${err}`); }
+        });
+
+        function handlePowerData(event) {
+            const value = event.target.value;
+            const flags = value.getUint16(0, true);
+            let offset = 2;
+            let power = value.getInt16(offset, true); offset += 2;
+            
+            if (flags & 1) offset += 1; 
+            if (flags & 4) offset += 2; 
+            if (flags & 16) offset += 6; 
+
+            if (flags & 32) {
+                let crankRevs = value.getUint16(offset, true); offset += 2;
+                let crankTime = value.getUint16(offset, true); offset += 2;
+                if (lastCrankTime !== 0 && crankTime !== lastCrankTime) {
+                    let dRevs = crankRevs - lastCrankRevs; if (dRevs < 0) dRevs += 0xFFFF;
+                    let dTime = crankTime - lastCrankTime; if (dTime < 0) dTime += 0xFFFF;
+                    currentCadence = Math.round((dRevs / (dTime / 1024.0)) * 60);
+                }
+                lastCrankRevs = crankRevs; lastCrankTime = crankTime;
+            }
+            
+            updateSimulation(power);
+        }
+
+        // ==========================================
+        // MOTOR DE SIMULACIÓN Y ACTUALIZACIÓN
+        // ==========================================
+        function updateSimulation(power) {
+            const now = Date.now();
+            const deltaHours = (now - lastUpdateTime) / 3600000;
+            lastUpdateTime = now;
+
+            power3sBuffer.push(power); power3sBuffer.shift();
+            const power3s = Math.round(power3sBuffer.reduce((a, b) => a + b, 0) / 3);
+
+            currentVirtualSpeed = calculateVirtualSpeed(power, currentGradient, riderWeight);
+
+            document.getElementById('spd-val').innerText = currentVirtualSpeed.toFixed(1);
+            document.getElementById('pwr-val').innerText = power3s;
+            document.getElementById('cad-val').innerText = currentCadence;
+            Plotly.update('gauge-container', {value: [power3s]});
+
+            if (isWorkoutActive && !isWorkoutFinished) {
+                currentVirtualDistance += (currentVirtualSpeed * deltaHours);
+                document.getElementById('dist-val').innerText = currentVirtualDistance.toFixed(2);
+                
+                let currentLat = 0, currentLon = 0;
+                
+                if (routeData.length > 0) {
+                    const point = routeData.find(p => p.distance >= currentVirtualDistance) || routeData[routeData.length - 1];
+                    currentElevation = point.elevation;
+                    currentGradient = point.gradient;
+                    currentLat = point.lat;
+                    currentLon = point.lon;
+                    
+                    document.getElementById('grad-val').innerText = currentGradient.toFixed(1);
+                    sendGradientToTrainer(currentGradient);
+                }
+                
+                Plotly.restyle('chart-container', { x: [[currentVirtualDistance]], y: [[currentElevation]] }, [1]);
+
+                sessionRecords.push({
+                    time: new Date(now).toISOString(),
+                    lat: currentLat,
+                    lon: currentLon,
+                    alt: currentElevation,
+                    dist: currentVirtualDistance * 1000,
+                    hr: currentHR || 0,
+                    cad: currentCadence,
+                    pwr: power,
+                    spd: currentVirtualSpeed / 3.6 
+                });
+            }
+        }
+
+        async function sendGradientToTrainer(gradientPercent) {
+            if (!activeControlChar) return;
+            
+            try {
+                if (activeControlProtocol === 'FTMS') {
+                    // Trama FTMS: OpCode 0x03, Int16 (resolución 0.5%)
+                    let inclinationValue = Math.round(gradientPercent * 2);
+                    let buffer = new ArrayBuffer(3);
+                    let view = new DataView(buffer);
+                    view.setUint8(0, 0x03);
+                    view.setInt16(1, inclinationValue, true);
+                    await activeControlChar.writeValue(buffer);
+                    
+                } else if (activeControlProtocol === 'FEC') {
+                    // Trama FE-C over BLE: Data Page 51
+                    let gradeValue = Math.round((gradientPercent + 200) * 100);
+                    let lsb = gradeValue & 0xFF;
+                    let msb = (gradeValue >> 8) & 0xFF;
+                    let msg = [0xA4, 0x09, 0x4F, 0x00, 0x33, 0xFF, 0xFF, 0xFF, 0xFF, lsb, msb, 0xFF];
+                    let checksum = 0;
+                    for(let i=0; i<msg.length; i++) checksum ^= msg[i];
+                    msg.push(checksum);
+                    await activeControlChar.writeValue(new Uint8Array(msg));
+                }
+            } catch(e) {
+                // Falla silenciosa permitida para evitar spam en consola si el rodillo está ocupado temporalmente
+            }
+        }
+
+        // ==========================================
+        // EXPORTACIÓN A TCX
+        // ==========================================
+        btnExport.addEventListener('click', () => {
+            if (sessionRecords.length === 0) return;
+            
+            let tcx = `<?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2">
+  <Activities>
+    <Activity Sport="Biking">
+      <Id>${startTime.toISOString()}</Id>
+      <Lap StartTime="${startTime.toISOString()}">
+        <TotalTimeSeconds>${sessionRecords.length}</TotalTimeSeconds>
+        <DistanceMeters>${sessionRecords[sessionRecords.length-1].dist}</DistanceMeters>
+        <Intensity>Active</Intensity>
+        <TriggerMethod>Manual</TriggerMethod>
+        <Track>\n`;
+
+            sessionRecords.forEach(r => {
+                tcx += `          <Trackpoint>
+            <Time>${r.time}</Time>`;
+                if (r.lat !== 0 && r.lon !== 0) {
+                    tcx += `
+            <Position>
+              <LatitudeDegrees>${r.lat}</LatitudeDegrees>
+              <LongitudeDegrees>${r.lon}</LongitudeDegrees>
+            </Position>`;
+                }
+                tcx += `
+            <AltitudeMeters>${r.alt.toFixed(1)}</AltitudeMeters>
+            <DistanceMeters>${r.dist.toFixed(1)}</DistanceMeters>`;
+                if (r.hr > 0) {
+                    tcx += `
+            <HeartRateBpm><Value>${r.hr}</Value></HeartRateBpm>`;
+                }
+                tcx += `
+            <Cadence>${r.cad}</Cadence>
+            <Extensions>
+              <TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2">
+                <Speed>${r.spd.toFixed(2)}</Speed>
+                <Watts>${r.pwr}</Watts>
+              </TPX>
+            </Extensions>
+          </Trackpoint>\n`;
+            });
+
+            tcx += `        </Track>
+      </Lap>
+    </Activity>
+  </Activities>
+</TrainingCenterDatabase>`;
+
+            const blob = new Blob([tcx], { type: 'application/vnd.garmin.tcx+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `EnduraLab_Session_${startTime.toISOString().slice(0,10)}.tcx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            log("Archivo .TCX descargado exitosamente.");
+        });
+
+        // ==========================================
+        // INICIALIZACIÓN PLOTLY
+        // ==========================================
+        function initGauge() {
+            Plotly.react('gauge-container', [{
+                type: "indicator", mode: "gauge+number", value: 0, 
+                title: { text: "Potencia (W)", font: { color: "#888", size: 14 } }, 
+                number: { font: { color: "white" } },
+                gauge: { 
+                    axis: { range: [null, ftp * 1.5], color: "white" }, bar: { color: "rgba(255,255,255,0.7)" }, bgcolor: "black",
+                    steps: [
+                        { range: [0, ftp*0.55], color: "#444" }, { range: [ftp*0.55, ftp*0.75], color: "#1e88e5" }, 
+                        { range: [ftp*0.75, ftp*0.90], color: "#43a047" }, { range: [ftp*0.90, ftp*1.05], color: "#fdd835" }, 
+                        { range: [ftp*1.05, ftp*1.20], color: "#fb8c00" }, { range: [ftp*1.20, ftp*2.0], color: "#e53935" }
+                    ],
+                    threshold: { line: { color: "white", width: 4 }, thickness: 0.75, value: ftp }
+                }
+            }], {paper_bgcolor: "#222", margin: { t: 30, b: 30, l: 30, r: 30 }});
+        }
+
+        function renderElevationProfile(xData, yData, titleSuffix) {
+            Plotly.react('chart-container', [
+                { x: xData, y: yData, type: 'scatter', mode: 'lines', fill: 'tozeroy', line: { color: '#444' }, hoverinfo: 'none' },
+                { x: [0], y: [yData.length > 0 ? yData[0] : 0], type: 'scatter', mode: 'markers', marker: { color: '#00ffcc', size: 14, symbol: 'circle-dot' }, name: 'Tu Posición' }
+            ], { 
+                title: {text: `Perfil de Altimetría (${titleSuffix})`, font: {color: "white"}}, 
+                paper_bgcolor: "#222", plot_bgcolor: "#111", 
+                xaxis: { title: "Distancia (km)", color: "white", showgrid: false }, 
+                yaxis: { title: "Altitud (m)", color: "white", showgrid: true, gridcolor: "#333" }, 
+                margin: { t: 40, b: 40, l: 50, r: 20 }, showlegend: false 
+            });
+        }
+
+    </script>
+</body>
+</html>

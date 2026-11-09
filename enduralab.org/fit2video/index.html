@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>EnduraLab Studio - Render Pro</title>
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+    <style>
+        body { margin: 0; background: #222; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #map { background: #000; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        #controls { position: absolute; top: 20px; left: 20px; z-index: 1000; background: #fff; padding: 20px; border-radius: 8px; width: 280px; }
+        .btn { width: 100%; padding: 12px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; color: white; margin-top: 10px; }
+        .file-upload { background: #555; display: block; text-align: center; padding: 10px; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <label for="fit-upload" class="file-upload">Adjuntar .fit</label>
+        <input type="file" id="fit-upload" accept=".fit">
+        <div style="margin-top:10px;">Formato:</div>
+        <select id="formato-select" style="width: 100%; margin-bottom:10px;">
+            <option value="900,1600" selected>Vertical HD (9:16)</option>
+            <option value="450,800">Vertical (9:16)</option>
+            <option value="1600,900">Horizontal HD (16:9)</option>
+            <option value="800,450">Horizontal (16:9)</option>
+        </select>
+        <div style="margin-top:10px;">Ángulo Cámara:</div>
+        <select id="angle-select" style="width: 100%; margin-bottom:10px;">
+            <option value="0" selected>Norte (Default)</option>
+            <option value="45">Nor-Este</option>
+            <option value="90">Este</option>
+            <option value="180">Sur</option>
+            <option value="270">Oeste</option>
+        </select>
+        <label>Duración (seg):</label>
+        <input type="number" id="duracion" value="25" style="width: 100%;">
+        <button class="btn" id="btn-iniciar" style="background:#0052cc">RENDERIZAR</button>
+        <button class="btn" id="btn-descargar" style="background:#00b359; display:none;">DESCARGAR</button>
+    </div>
+    <div id="map"></div>
+
+    <script type="module">
+        import FitParser from 'https://esm.sh/fit-file-parser@1.9.0';
+        
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+			//style: 'https://tiles.stadiamaps.com/styles/stamen_terrain.json',
+			//style: 'https://tiles.stadiamaps.com/styles/osm_bright.json', 
+            center: [-71.6, -33.3], zoom: 14, pitch: 50, antialias: false, preserveDrawingBuffer: true
+        });
+
+        function aplicarCambios() {
+            const [w, h] = document.getElementById('formato-select').value.split(',');
+            document.getElementById('map').style.width = w + 'px';
+            document.getElementById('map').style.height = h + 'px';
+            map.resize();
+            map.jumpTo({ bearing: parseInt(document.getElementById('angle-select').value) });
+        }
+
+        document.getElementById('formato-select').addEventListener('change', aplicarCambios);
+        document.getElementById('angle-select').addEventListener('change', aplicarCambios);
+
+        map.on('load', () => {
+            map.addSource('terreno-3d', { type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 12 });
+            map.setTerrain({ source: 'terreno-3d', exaggeration: 0.2 });
+            aplicarCambios();
+        });
+
+        // ... (Mantén tu lógica de FitParser y animación igual)
+        let lineaRuta, nombreArchivo;
+        document.getElementById('fit-upload').addEventListener('change', (e) => {
+            const reader = new FileReader();
+            nombreArchivo = e.target.files[0].name.replace(".fit", "");
+            reader.onload = (ev) => {
+                new FitParser({mode: 'list'}).parse(ev.target.result, (err, data) => {
+                    const coords = data.records.filter(r => r.position_lat).map(r => [r.position_long, r.position_lat]);
+                    lineaRuta = { type: "Feature", geometry: { type: "LineString", coordinates: coords } };
+                    if(map.getSource('ruta')) { map.removeLayer('linea'); map.removeLayer('punto'); map.removeSource('ruta'); map.removeSource('posicion'); }
+                    map.addSource('ruta', { type: 'geojson', data: lineaRuta });
+                    map.addLayer({ id: 'linea', type: 'line', source: 'ruta', paint: {'line-color': '#ff0000', 'line-width': 6} });
+                    map.addSource('posicion', { type: 'geojson', data: turf.point(coords[0]) });
+                    map.addLayer({ id: 'punto', type: 'circle', source: 'posicion', paint: {'circle-radius': 8, 'circle-color': '#000', 'circle-stroke-width': 2, 'circle-stroke-color': '#fff'} });
+                    map.fitBounds(turf.bbox(lineaRuta), { padding: 50 });
+                });
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+        });
+
+        document.getElementById('btn-iniciar').addEventListener('click', () => {
+            if(!lineaRuta) return alert("¡Primero adjunta un archivo!");
+            
+            const duracion = parseInt(document.getElementById('duracion').value);
+            const offset = parseInt(document.getElementById('angle-select').value);
+            const totalFrames = duracion * 60;
+            const distTotal = turf.length(lineaRuta, {units: 'kilometers'});
+            
+            // Usamos un stream a 30fps que es más estable en todos los navegadores
+            const stream = map.getCanvas().captureStream(30);
+            const recorder = new MediaRecorder(stream, { mimeType: 'video/webm', videoBitsPerSecond: 4000000 });
+            const chunks = [];
+            recorder.ondataavailable = (e) => chunks.push(e.data);
+            recorder.start();
+
+            let i = 0;
+            function animar() {
+                if (i >= totalFrames) {
+                    recorder.stop();
+                    return;
+                }
+                
+                const p = turf.along(lineaRuta, (i/totalFrames) * distTotal, {units: 'kilometers'});
+                map.getSource('posicion').setData(p);
+                map.jumpTo({ 
+                    center: p.geometry.coordinates, 
+                    zoom: 15.5, 
+                    pitch: 50, 
+                    bearing: offset 
+                });
+                
+                i++;
+                requestAnimationFrame(animar);
+            }
+            animar();
+
+            recorder.onstop = () => {
+                const url = URL.createObjectURL(new Blob(chunks, {type: 'video/webm'}));
+                const btn = document.getElementById('btn-descargar');
+                btn.style.display = 'block';
+                btn.onclick = () => { 
+                    const a = document.createElement('a'); 
+                    a.href = url; 
+                    a.download = `${nombreArchivo}.webm`; 
+                    a.click(); 
+                };
+                alert("Renderizado completado");
+            };
+        });
+    </script>
+</body>
+</html>

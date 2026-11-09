@@ -1,0 +1,324 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Intervals.icu//Cycling//EN
+NAME:Hector Intervals.icu calendar
+X-WR-CALNAME:Hector Intervals.icu calendar
+UID:0f188f5309939e6c
+CALSCALE:GREGORIAN
+URL:https://intervals.icu/athlete/i27966/activities
+REFRESH-INTERVAL:PT15M
+LAST-MODIFIED:20261105T015226Z
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:43af25cf-62a4-43e1-83da-5345a50d2935
+DTSTART;VALUE=DATE:20261029
+DTEND;VALUE=DATE:20261030
+SUMMARY:Bike: 1h5m Ciclismo Base y Fuerza Resistencia
+DESCRIPTION:Rodaje en Z2 manteniendo posición acoplada\, intercalando estím
+ ulos de torque a baja cadencia (60-65 RPM) sin sobrepasar la zona aeróbica 
+ para fortalecer fibras lentas.\n\nWarmup\n- 10m Z1 Power\n\nMain Set 3x\n- 
+ 12m Z2 Power\n- 3m Z1 Power\n\nCooldown\n- 10m Z1 Power\n39 training load
+LAST-MODIFIED:20261029T155428Z
+CATEGORIES:WORKOUT
+CATEGORIES:Ride
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:4e65f6d3-e437-44e4-bf8c-960dbdf8a62d
+DTSTART;VALUE=DATE:20261029
+DTEND;VALUE=DATE:20261030
+SUMMARY:WeightTraining: 40m Sesión de Fuerza: Potencia de Cadena Posterior
+DESCRIPTION:Fuerza orientada a la transmisión de potencia en el pedal y est
+ abilidad pélvica en carrera.\n\nWarmup\n- 10m Activación dinámica de cader
+ a\n\nMain Set 4x\n- 2m Hip Thrust con carga media\n- 2m Prensa de piernas 
+ o Step-up alto\n- 1m Pallof Press isométrico\n- 1m Descanso\n\nCooldown\n- 
+ 6m Liberación miofascial
+LAST-MODIFIED:20261025T130029Z
+CATEGORIES:WORKOUT
+CATEGORIES:WeightTraining
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:d6570aab-1f6c-4991-a956-21eec58c3be7
+DTSTART;VALUE=DATE:20261029
+DTEND;VALUE=DATE:20261030
+SUMMARY:Run: 30m Trote Corto Regenerativo
+DESCRIPTION:Soltura muscular suave previo al bloque de volumen del fin de s
+ emana. Mantener pulsaciones bajas.\n\nWarmup\n- 5m Z1 Pace\n\nMain Set\n- 
+ 20m Z2 Pace\n\nCooldown\n- 5m Z1 Pace\n31 training load
+LAST-MODIFIED:20261028T170028Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:45081c97-de48-47a9-9e09-9c2fb20bc1e5
+DTSTART;VALUE=DATE:20261029
+DTEND;VALUE=DATE:20261030
+SUMMARY:Swim: 40m Natación Velocidad y Umbral CSS (Estímulo Z4 #2)
+DESCRIPTION:Segunda sesión de alta intensidad de la semana (con más de 48h 
+ de separación respecto al martes). Trabajo a ritmo CSS para mejorar la tol
+ erancia al lactato en el agua.\n\nWarmup\n- 0.300KM Z1 pace\n- 5s rest\n\n
+ Drills 4x\n- 0.050KM Z2 pace\n- 15s rest\n\nMain Set 12x\n- 0.100KM Z4 pac
+ e\n- 15s rest\n\nCooldown\n- 0.200KM Z1 pace\n40 training load
+LAST-MODIFIED:20261029T205157Z
+CATEGORIES:WORKOUT
+CATEGORIES:Swim
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:4f4e5360-48af-4dfd-bd29-b533c10a8f04
+DTSTART;VALUE=DATE:20261030
+DTEND;VALUE=DATE:20261031
+SUMMARY:Run: 50m Trote Base Aeróbico
+DESCRIPTION:Acumulación de volumen en zona aeróbica extensiva para mejorar 
+ el acoplamiento cardíaco en terreno llano.\n\nWarmup\n- 10m Z1 Pace\n\nMai
+ n Set\n- 35m Z2 Pace\n\nCooldown\n- 5m Z1 Pace\n52 training load
+LAST-MODIFIED:20261028T170024Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:ae9afbeb-f825-4cbc-88cc-611267dda47b
+DTSTART;VALUE=DATE:20261031
+DTEND;VALUE=DATE:20261101
+SUMMARY:Bike: 3h45m Ciclismo Larga Distancia (Especificidad Canyon Speedmax
+ )
+DESCRIPTION:Tirada larga de sobrecarga progresiva con bloques a ritmo de ca
+ rrera 70.3 (Z3) y trabajo en subidas (60-70 RPM) para adaptar los 700m de 
+ desnivel. Nutrición: Prescribir consumo de EnduraLab ENS One Lactate antes 
+ y durante los bloques críticos de intensidad (Z3) para maximizar la absorc
+ ión y utilizar el buffer de lactato\, alternando con EnduraLab ENS One en 
+ las fases Z2.\n\nWarmup\n- 20m Z1 Power\n- 20m Z2 Power\n\nMain Set 3x\n- 
+ 30m Z3 Power\n- 15m Z2 Power\n\nCooldown\n- 35m Z2 Power\n- 15m Z1 Power\n
+ 197 training load
+LAST-MODIFIED:20261025T130030Z
+CATEGORIES:WORKOUT
+CATEGORIES:Ride
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:55f17ec0-e4d0-4d6d-873c-7eeb9f1958c3
+DTSTART;VALUE=DATE:20261101
+DTEND;VALUE=DATE:20261102
+SUMMARY:Run: 45m [AJUSTADO TIER 3] Trote Largo Especificidad 70.3
+DESCRIPTION:Sesión modificada a recuperación activa continua por fatiga sev
+ era (Caída HRV 33.0%). Priorizar hidratación y descanso.\n\nMain Set\n- 45
+ m Z1 Pace\n36 training load
+LAST-MODIFIED:20261101T093041Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:16a8dcbe-eabb-4dae-8ca1-ccc1934118af
+DTSTART:20261103T100000Z
+DTEND:20261103T112500Z
+SUMMARY:Run: 1h25m Trote Umbral y Ritmo 70.3 (Estímulo Z4 #1)
+DESCRIPTION:Convergencia al ritmo objetivo de 5:15-5:20/km con inserciones 
+ de umbral láctico. Consumo de 30g CHO en gel isotónico EnduraLab 15 minuto
+ s antes de iniciar.\n\nWarmup\n- 15m Z1 pace\n- 5m Z2 pace\n\nMain Set 4x\
+ n- 8m Z4 pace\n- 2m recover\n\nTempo\n- 15m Z3 pace\n\nCooldown\n- 10m Z1 
+ pace\n95 training load
+LAST-MODIFIED:20261102T132046Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:8662987f-a12e-43e2-af85-520b763f60a9
+DTSTART:20261103T100000Z
+DTEND:20261103T104158Z
+SUMMARY:Swim: 41m Natación Tolerancia CSS y Ritmo
+DESCRIPTION:Última sesión acuática de la semana. Series fraccionadas al rit
+ mo umbral (1:40/100m) para consolidar velocidad crucero sin generar fatiga 
+ excesiva de cara al fin de semana.\n\nWarmup\n- 0.4km Z1 pace\n- 15s recov
+ er\n\nMain Set 12x\n- 0.1km Z3 pace\n- 15s recover\n\nCooldown\n- 0.3km Z1 
+ pace\n35 training load
+LAST-MODIFIED:20261103T195044Z
+CATEGORIES:WORKOUT
+CATEGORIES:Swim
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:b6fd9046-81bc-44f0-b813-5721b0ca75fa
+DTSTART:20261103T210000Z
+DTEND:20261103T212430Z
+SUMMARY:WeightTraining: 24m Fuerza Mantenimiento y Estabilidad Core
+DESCRIPTION:Activación neuromuscular y blindaje articular para alta carga e
+ specífica de la semana. Post-entreno: 25g de proteína isolada EnduraLab si
+ n carbohidratos adicionales.\n\nWarmup\n- 300s Plank @ z1 hr\n\nPiernas 3x
+ \n- 1m Bulgarian Split Squat 10 reps @ z2 hr\n- 45s recover\n- 1m Romanian 
+ Deadlift 10 reps @ z2 hr\n- 45s recover\n\nCore 3x\n- 30s Side Plank @ z2 
+ hr \n- 30s Side Plank @ z2 hr\n- 30s recover\n- 30s Calf Raise 15 reps @ z
+ 1 hr\n- 30s Calf Raise 15 reps @ z1 hr\n- 30s recover\n14 training load
+LAST-MODIFIED:20261103T201100Z
+CATEGORIES:WORKOUT
+CATEGORIES:WeightTraining
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:91565da3-9267-448f-8770-99d9ad9416f9
+DTSTART:20261104T100000Z
+DTEND:20261104T110000Z
+SUMMARY:Bike: 1h25m Ciclismo Fuerza-Resistencia y Torque (Específico Desniv
+ el Valdivia)
+DESCRIPTION:Adaptación al desnivel positivo de Valdivia (700m+) trabajando 
+ cadencia baja (60-65 RPM) en posición acoplada. Ingerir 60g de carbohidrat
+ os durante la sesión y 600ml de líquido con sales minerales.\n\nWarmup\n- 
+ 15m Z1 power\n\nMain Set 4x\n- 8m Z3 power\n- 3m recover\n\nEndurance\n- 1
+ 6m Z2 power\n\nCooldown\n- 10m Z1 power\n66 training load
+LAST-MODIFIED:20261104T021241Z
+CATEGORIES:WORKOUT
+CATEGORIES:Ride
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:8edbc696-5d1d-41cd-8573-ec9d827f14d0
+DTSTART:20261104T213000Z
+DTEND:20261104T223000Z
+SUMMARY:WeightTraining: 32m Fuerza Estabilidad y Cadena Posterior
+DESCRIPTION:Mantenimiento de fuerza máxima e isometría para soporte estruct
+ ural sin comprometer la recuperación nerviosa. Suplementación post-entreno 
+ inmediata con 25g de proteína aislada de suero.\n\nWarmup\n- 300s @ Z1 hr 
+ Plank\n- 60s recover\n\nPiernas 3x\n- 60s @ Z2 hr Bulgarian Split Squat 8 
+ reps\n- 60s recover\n- 60s @ Z2 hr Romanian Deadlift 8 reps\n- 60s recover
+ \n- 45s @ Z1 hr Calf Raise 15 reps\n- 45s recover\n\nCore 3x\n- 60s @ Z1 h
+ r Side Plank\n- 30s recover\n- 60s @ Z1 hr Push-Up 12 reps\n- 45s recover\
+ n14 training load
+LAST-MODIFIED:20261104T021244Z
+CATEGORIES:WORKOUT
+CATEGORIES:WeightTraining
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:8437c4c4-b921-4274-9558-4f6d827060a3
+DTSTART:20261105T100000Z
+DTEND:20261105T104836Z
+SUMMARY:Swim: 48m Natación Ritmo Competición 70.3
+DESCRIPTION:Ajuste fino al ritmo objetivo de 38 minutos para los 1900m. Man
+ tener frecuencia de brazada estable. Hidratación con 500ml de bebida isotó
+ nica durante la sesión.\n\nWarmup\n- 0.3km Z1 pace\n-15s recover\n\nDrills 
+ 4x\n- 0.05km Z2 pace\n- 15s recover\n\nMain Set 4x\n- 0.4km Z3 pace\n- 30s 
+ recover\n\nCooldown\n- 0.2km Z1 pace\n46 training load
+LAST-MODIFIED:20261105T015130Z
+CATEGORIES:WORKOUT
+CATEGORIES:Swim
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:a0dfa39a-f3e5-4a6b-b0cc-428e60e92487
+DTSTART:20261105T213000Z
+DTEND:20261105T221500Z
+SUMMARY:Run: 45m Trote Base Aeróbico y Economía
+DESCRIPTION:Rodaje suave en zona aeróbica estricta para acumular volumen si
+ n fatiga residual. Consumo de agua a demanda y comida rica en carbohidrato
+ s complejos post-sesión (carga previa al fin de semana).\n\nWarmup\n- 10m 
+ Z1 hr\n\nMain Set\n- 30m Z2 hr\n\nCooldown\n- 5m Z1 hr\n40 training load
+LAST-MODIFIED:20261105T015226Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:14408398-056f-46b7-a0e6-1be34aa63375
+DTSTART:20261106T100000Z
+DTEND:20261106T110000Z
+SUMMARY:Swim: 39m Natación Regenerativa y Deslizamiento
+DESCRIPTION:Tercera sesión obligatoria de natación de la semana. Enfoque pu
+ ramente técnico y regenerativo antes del bloque de volumen del fin de sema
+ na. Hidratación basal con electrolitos.\n\nWarmup\n- 0.3km Z1 pace\n\nDril
+ ls 6x\n- 0.05km Z2 pace\n- 20s recover\n\nMain Set\n- 0.8km Z1 pace\n- 30s 
+ recover\n\nCooldown\n- 0.2km Z1 pace\n23 training load
+LAST-MODIFIED:20261104T021249Z
+CATEGORIES:WORKOUT
+CATEGORIES:Swim
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:35c134bd-a83e-4cd1-bf7d-f78bb94345e6
+DTSTART:20261106T213000Z
+DTEND:20261106T224000Z
+SUMMARY:Bike: 1h10m Ciclismo Umbral y Potencia Sostenida (Estímulo Z4 #2)
+DESCRIPTION:Segundo estímulo de alta intensidad semanal separado por 48 hor
+ as. Enfoque en sostener potencia sobre el objetivo de carrera para generar 
+ reserva de velocidad. Ingesta estricta de 60g de carbohidratos durante la 
+ hora.\n\nWarmup\n- 15m Z1 power\n\nMain Set 3x\n- 10m Z4 power\n- 4m Z1 re
+ cover\n\nCooldown\n- 13m Z1 power\n75 training load
+LAST-MODIFIED:20261105T015218Z
+CATEGORIES:WORKOUT
+CATEGORIES:Ride
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:6f287678-37ad-47df-aba6-150636da6071
+DTSTART:20261107T100000Z
+DTEND:20261107T110000Z
+SUMMARY:Bike: 3h30m Ciclismo Larga Distancia Específico 70.3 (Canyon Speedm
+ ax)
+DESCRIPTION:Simulación completa del sector de ciclismo de Valdivia (meta: 1
+ 75-185W por ~2h50m). Acoplamiento constante y secciones de alto torque en 
+ subidas. Protocolo nutricional de competencia obligatorio: 80-90g de carbo
+ hidratos por hora y 750ml de fluido con 700mg de sodio por hora.\n\nWarmup
+ \n- 20m Z1 power\n\nEndurance\n- 40m Z2 power\n\nRace Pace 3x\n- 30m Z3 po
+ wer\n- 10m recover\n\nEndurance\n- 15m Z2 power\n\nCooldown\n- 15m Z1 powe
+ r\n177 training load
+LAST-MODIFIED:20261104T021250Z
+CATEGORIES:WORKOUT
+CATEGORIES:Ride
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:23629af0-6ff5-47cc-8fa2-00b8899dd7b0
+DTSTART:20261107T133000Z
+DTEND:20261107T143000Z
+SUMMARY:Run: 25m Trote de Transición (Brick Específico 70.3)
+DESCRIPTION:Transición inmediata tras el ciclismo largo. Buscar ritmo objet
+ ivo de competencia (5:15-5:20/km) en el bloque principal bajo fatiga muscu
+ lar previa. Ingerir 1 gel con cafeína al iniciar la carrera y 300ml de agu
+ a.\n\nWarmup\n- 5m Z2 pace\n\nMain Set\n- 15m Z3 pace\n\nCooldown\n- 5m Z1 
+ pace\n30 training load
+LAST-MODIFIED:20261104T021252Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:137c29e9-fdcf-4788-a11d-5516098e2bc9
+DTSTART:20261108T100000Z
+DTEND:20261108T110000Z
+SUMMARY:Run: 1h50m Tirada Larga Específica 70.3 Valdivia
+DESCRIPTION:Última tirada larga clave de pico antes del taper. Inserción de 
+ bloques a ritmo de carrera (5:15-5:20/km) en terreno plano. Nutrición intr
+ a-entreno: 60g de carbohidratos por hora mediante geles cada 25 minutos y 
+ 500ml de isotónico por hora.\n\nWarmup\n- 15m Z1 pace\n\nEndurance\n- 35m 
+ Z2 pace\n\nRace Pace 2x\n- 20m Z3 pace\n- 5m recover\n\nCooldown\n- 10m Z1 
+ pace\n114 training load
+LAST-MODIFIED:20261104T021254Z
+CATEGORIES:WORKOUT
+CATEGORIES:Run
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:babcdbb1-faa2-4c5a-8dce-8e6162f22871
+DTSTART;VALUE=DATE:20261129
+DTEND;VALUE=DATE:20261130
+SUMMARY:Other: IM 70.3 Valdivia
+DESCRIPTION:
+LAST-MODIFIED:20260812T003218Z
+CATEGORIES:RACE_A
+CATEGORIES:Other
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20261106T080001Z
+UID:7e334274-3a64-4f62-9580-385c20cae5cb
+DTSTART;VALUE=DATE:20270516
+DTEND;VALUE=DATE:20270517
+SUMMARY:Run: 4h30m Maraton de Santiago
+DESCRIPTION:
+LAST-MODIFIED:20261019T112810Z
+CATEGORIES:RACE_A
+CATEGORIES:Run
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/8555/8555146.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EnduraLAB Generador de Códigos QR">
+    <link rel="apple-touch-icon" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/8555/8555146.png">
+    <title>EnduraLAB Generador de Códigos QR</title>
+    <link rel="stylesheet" href="style.css?v=1.0">
+	<script src="app.js?v=1.0" defer></script>	   
+    <!-- Biblioteca QR nativa y ligera desde CDN confiable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 id="mainTitle" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+      <img src="https://cdn-icons-png.flaticon.com/512/8555/8555146.png" alt="QR Logo" style="width: 32px; height: 32px;">
+      Generador de QR
+    </h1>
+    <input type="text" id="text-input" value="https://www.enduralab.org" placeholder="Escribe la URL aquí">
+    <div id="qrcode"></div>
+    <div class="btn-group">
+        <button class="btn-png" onclick="downloadQR('png')">Bajar PNG</button>
+        <button class="btn-jpg" onclick="downloadQR('jpg')">Bajar JPG</button>
+    </div>
+</div>
+</body>
+</html>
